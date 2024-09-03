@@ -1,47 +1,42 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import Button from "./Button";
+import PropTypes from "prop-types";
 
-class GuessControl extends Component {
-  constructor(props) {
-    super(props);
+// Steps for refactoring Class Components to Functional Components:
+// 1. Create new empty functional component
+// 2. render method -> return
+// 3. props -> props
+// 4. this.state -> useState() (remember to import useState)
+// 5. handlerMethods -> handlerFunctions
+// 6. Ensure all this's are gone and also this.state's
+// 7. Ensure all setStates are replaced with individual useState setters
+// 8. Comment out old class component and rename new func component with same name
+// 9. Test it out and make sure it works!
 
-    this.state = {
-      currentGuess: "",
-    };
+function GuessControl(props) {
+  const [currentGuess, setCurrentGuess] = useState("");
 
-    /**
-     * These lines are required to make the methods/functions declared on this
-     *  class have the correct `this` object when they run.
-     */
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.onSubmitGuess = this.onSubmitGuess.bind(this);
+  function handleInputChange(event) {
+    setCurrentGuess(event.target.value);
   }
 
-  handleInputChange(event) {
-    this.setState({ currentGuess: event.target.value });
+  function onSubmitGuess() {
+    if (props.onGuess) {
+      props.onGuess(Number(currentGuess));
+    }
+    setCurrentGuess("");
   }
 
-  onSubmitGuess() {
-    // Since the values from an HTML input are strings by default,
-    //  convert to a number for the returned guess value
-    //  by passing in the string to the Number function.
-    // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number
-    this.props.onGuess(Number(this.state.currentGuess));
-    this.setState({ currentGuess: "" });
-  }
-
-  render() {
-    return (
-      <div>
-        <input
-          type="number"
-          value={this.state.currentGuess}
-          onChange={this.handleInputChange}
-        />
-        <Button onClick={this.onSubmitGuess}>Submit Guess</Button>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <input type="number" value={currentGuess} onChange={handleInputChange} />
+      <Button onClick={onSubmitGuess}>Submit Guess</Button>
+    </div>
+  );
 }
+
+GuessControl.propTypes = {
+  onGuess: PropTypes.func.isRequired,
+};
 
 export default GuessControl;
